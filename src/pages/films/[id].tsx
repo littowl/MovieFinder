@@ -1,10 +1,11 @@
-import { MainLayout } from "@/components/layouts/Main";
-import Details from "@/components/templates/Details";
+import { CommentList, FilmCard } from '@/components/ui'
+import * as Style from './Films.styled'
 
-export default function Home() {
-  return (
-    <MainLayout>
-      <Details />
-    </MainLayout>
-  );
+export default function Film() {
+    return (
+        <Style.Container>
+            <FilmCard />
+            <CommentList />
+        </Style.Container>
+    )
 }

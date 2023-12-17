@@ -1,12 +1,18 @@
-import { MainLayout } from "@/components/layouts/Main";
-import Films from "@/components/templates/Films/index";
+import { FilmList, Header } from '@/components/ui'
 
 const App = () => {
-  return (
-    <MainLayout>
-      <Films />
-    </MainLayout>
-  );
-};
+    const genres = ['Thriller', 'Romance', 'Drama', 'Horror']
 
-export default App;
+    return (
+        <div>
+            <Header />
+            <div>
+                {genres.map((genre) => (
+                    <FilmList key={genre} genre={genre} />
+                ))}
+            </div>
+        </div>
+    )
+}
+
+export default App

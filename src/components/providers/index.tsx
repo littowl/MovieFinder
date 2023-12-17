@@ -1,12 +1,7 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren } from 'react'
 
-import { QueryProvider } from "./QueryProvider";
-import { ThemeProvider } from "./ThemeProvider";
+import { QueryProvider } from './QueryProvider'
 
 export const RootProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  return (
-    <QueryProvider>
-      <ThemeProvider>{children}</ThemeProvider>
-    </QueryProvider>
-  );
-};
+    return <QueryProvider>{children}</QueryProvider>
+}
