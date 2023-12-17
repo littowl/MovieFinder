@@ -3,13 +3,15 @@ import * as Style from './FilmList.styled'
 import Link from 'next/link'
 import Loader from '@/components/common/Loader'
 import Pagination from '@/components/common/Pagination/Pagination'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export const FilmList = ({ genre }: { genre: string }) => {
-    const [page, setPage] = useState(
-        Number(localStorage.getItem(`${genre}_page`)) || 1
-    )
+    const [page, setPage] = useState(1)
     const { filmList, isLoading } = useFilmList(String(page), '10', genre)
+
+    useEffect(() => {
+        setPage(Number(localStorage.getItem(`${genre}_page`)) || 1)
+    }, [])
 
     if (isLoading) {
         return <Loader />
