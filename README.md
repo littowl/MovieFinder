@@ -1,38 +1,78 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Работа приложения
+Приложение содержит в себе страницы, находящиеся в директории `src/pages`, т.е. `index.tsx` и `films/[id].tsx`, которые отвечают маршрутам `/` и `/film/$id`. Страница конкретного фильма содержит в себе параметр id и является динамическим маршрутом (id в URL зависит от id фильма). 
 
-## Getting Started
+В этой же директории находятся файлы `_app.ts` (он нужен для переопределения функции App - в нашем случае мы оборачиваем приложение в провайдер QueryClientProvider из библиотеки `react-query`, чтобы иметь доступ к контексту библиотеки, а также задаём странице название и иконку и импортируем глобальный стиль) и `_document.tsx` (он определяет какой-то общий код для всех страниц).
 
-First, run the development server:
-
+Каждая страница содержит в себе компоненты, импортируемые из директории `components`. Компоненты стилизуются при помощи технологии Styled Components, когда мы определяем какой-то компонент и стилизуем для него один из html-тегов  в следующем формате: 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+export const Container = styled.div`
+    padding: 0 5% 0 5%;
+`
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Подробно про работу каждой страницы
+#### Каталог фильмов
+Содержит в себе массив `genres`, отвечающий за отображаемые жанры на сайте (можно в коде добавить или убрать какой-то элемент по желанию, главное, чтобы такой жанр существовал в api). Из компонентов содержит в себе `Header` и `FilmList`, при этом компонент `FilmList` выводится при помощи метода `map`, который перебирает массив жанров и возвращает для каждого жанра свой отображаемый список.
+#### Страница фильма
+Содержит компоненты `FilmCard` и `CommentList` (их работа описана ниже в разделе Файловая структура/Директория src/Components).
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## Файловая структура
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+### Директория src
+Директория `src` отвечает за:
+- код компонентов (директория components);
+- код страниц (директория pages, принцип работы описан в начале в разделе Работа приложения);
+- код кастомных хуков (директория hooks);
+- код взаимодействия с api (директория lib);
+- глобальный стиль (директория styles);
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+#### components - компоненты
+В директории `common` прописаны компоненты, используемые в других компонентах:
+- `Loader` - просто блок с иконкой и текстом, отображается при ожидании данных с api;
+- `Pagination` - компонент для управления постраничным выводом, при этом выбранные страницы сохраняем в localStorage:
+```bash
+localStorage.setItem(
+  `${props.genre}_page`,
+  String(element)
+)
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+В директории `providers` прописан провайдер, в который оборачивается приложение.
 
-## Learn More
+В директории `ui` содержатся компоненты, используемые на страницах в директории `pages`:
+- `CommentList` - компонент, отвечающий за создание и отображение комментариев, содержит в себе инпут для ввода коммента, кнопку создания коммента (можно также юзать 'Enter') и список комментариев с возможностью удаления. Значение в инпуте управляется с помощью ```bash const [comment, setComment] = useState('')```, где comment - это текстовое значение, а setComment - функция управления этим значением. Список комментариев выводится мапом - перебираем массив comments, на каждый коммент рисуем элемент. За удаление комментария отвечает этот код:
+```bash
+onClick={() =>
+  setComments(
+    comments.filter(
+       (comment) => comment.id !== id
+    )
+  )
+}
+```
+- FilmCard - карточка фильма с названием, фото и описанием - вытягивает id из URL-параметров (router.query.id), посылает запрос на бек в `useFilmRetrieve`, в процессе загрузки данных отображает `<Loader />`, затем уже отрисовываем верстку с полученными данными. Есть функция обрезки слишком длинного описания `descriptionSlice`, если описания нет, то отображаем `NO SUMMARY PROVIDED`.
+- FilmList - список фильмов по жанру - в пропсах принимает `genre`, этот жанр вместе с параметрами пагинации передаёт в запрос на бек в `useFilmList`, в процессе загрузки данных отображает `<Loader />, затем уже выводит список полученных фильмов с помощью map. Каждый фильм обернут в ссылку для перехода на его страницу.
+- Header - просто шапка сайта с названием.
 
-To learn more about Next.js, take a look at the following resources:
+#### hooks - кастомные хуки
+Содержит в себе кастомный хку useWindowSize, определяющий ширину и выосту экрана.
+#### lib - взаимодействие с api
+Содержит в себе axios-инстанс, в котором прописывается основа URL для запросов к серверу, а также директории `api` и `hooks`. 
 
--   [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
--   [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+В `api` прописан тип получаемых данных и запросы:
+- filmListQuery для получения списка фильмов по жанру, и странице;
+- filmRetrieveQuery для получения конкретного фильма по id.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+В `hooks` хуки с использованием метода useQuery из библиотеки `react-query` для проведения запросов к серверу:
+- useFilmList для получения списка фильмов (использует запрос filmListQuery из `./api`;
+- useFilmRetrieve для получения фильма по id (использует запрос filmRetrieveQuery из `./api`
 
-## Deploy on Vercel
+### Директория public
+Директория `public` хранит в себе иконку сайта.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Файлы в корневой директории:
+`package.json` - файл со списком зависимостей проекта;
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+`.prettierrc.json` и `.prettierignore` - файлы для инструмента форматирования кода prettier, в которых прописывается конфигурация и файлы, которые не следует форматировать;
+
+`tsconfig.json` - файл, в котором прописывается конфигурация TypeScript;
