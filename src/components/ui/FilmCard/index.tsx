@@ -30,6 +30,20 @@ export const FilmCard = () => {
                         : 'NO SUMMARY PROVIDED'}
                 </Style.Description>
             </Style.Card>
+            <Style.Characteristics>
+                Genres:
+                {filmRetrieve?.genres.map((genre) => (
+                    <Style.Genre>{genre}</Style.Genre>
+                ))}
+            </Style.Characteristics>
+            <Style.Characteristics>
+                Additional information:
+                <Style.Item>
+                    Download count: {filmRetrieve?.download_count || 0}
+                </Style.Item>
+                <Style.Item>Rating: {filmRetrieve?.rating}/10</Style.Item>
+                <Style.Item>Year: {filmRetrieve?.year}</Style.Item>
+            </Style.Characteristics>
         </>
     )
 }

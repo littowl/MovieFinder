@@ -26,9 +26,21 @@ export const Film = styled.div`
     margin-right: 23px;
     min-height: 419px;
     min-width: 230px;
+    @media (max-width: 900px) {
+        min-width: 30%;
+        min-height: 319px;
+    }
+    @media (max-width: 768px) {
+        min-width: 30%;
+        min-height: 250px;
+    }
 `
 
-export const Image = styled.img``
+export const Image = styled.img`
+    @media (max-width: 900px) {
+        width: 100%;
+    }
+`
 
 export const Caption = styled.div`
     display: flex;
@@ -44,4 +56,11 @@ export const Title = styled.p`
     font-weight: 700;
     line-height: 23px;
     padding: 15px;
+    @media (max-width: 900px) {
+        font-size: 16px;
+    }
+    @media (max-width: 768px) {
+        font-size: 14px;
+        line-height: 15px;
+    }
 `
